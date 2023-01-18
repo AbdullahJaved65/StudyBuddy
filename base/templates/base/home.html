@@ -1,0 +1,28 @@
+{% extends 'main.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+</head>
+{% block content %}
+    <body>
+    <h1>Hello, World!</h1>
+    <h1>I'm learning Django!</h1>
+    <h1>Wish me Luck!</h1>
+    <a href="{% url 'create-room' %}">Create A Room!</a>
+    <div>
+        {% for room in rooms %}
+            <div>
+                <a href="{% url 'update-room' room.id %}">Edit The Room</a>
+                <a href="{% url 'delete-room' room.id %}">Delete The Room</a>
+                <span>@{{ room.host.username }}</span>
+                <h4>{{ room.id }} -- <a href="{% url 'room' room.id %}">{{ room.name }}</a></h4>
+                <small>{{ room.topic.name }}</small>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+    </body>
+{% endblock content %}
+</html>
