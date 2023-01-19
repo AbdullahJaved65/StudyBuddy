@@ -6,6 +6,11 @@
 </head>
 <body>
 <a href="/">LOGO</a>
+<form action="{% url 'home' %}" method="get">
+    <label>
+        <input type="text" name="q" placeholder="Search Rooms...">
+    </label>
+</form>
 <hr>
 </body>
 </html>
