@@ -1,8 +1,10 @@
 from typing import Any
-
+from django.contrib.auth import authenticate, login, logout
 from django.db.models import QuerySet
 from django.shortcuts import render, redirect
 from django.db.models import Q
+from django.contrib import messages
+from django.contrib.auth.models import User
 
 from .forms import RoomForm
 from .models import Room, Topic
@@ -16,6 +18,30 @@ from .models import Room, Topic
 # ]
 
 
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            messages.error(request, 'User Does not Exist')
+
+        user = authenticate(request,
+                            username=username,
+                            password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Username OR Password not found')
+
+    context = {}
+    return render(request, 'base/login_register.html', context)
+
+
 def home(request):
     q = request.GET.get('q') \
         if request.GET.get('q') is not None else ''
@@ -26,7 +52,9 @@ def home(request):
     )
     room_count = rooms.count()
     topics = Topic.objects.all()
-    context = {'rooms': rooms, 'topics': topics, 'room_count': room_count}
+    context = {'rooms': rooms,
+               'topics': topics,
+               'room_count': room_count}
     return render(request, 'base/home.html', context)
 
 
