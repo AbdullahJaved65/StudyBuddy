@@ -1,21 +1,15 @@
 from typing import Any
-from django.contrib.auth import authenticate, login, logout
-from django.db.models import QuerySet
 from django.shortcuts import render, redirect
+
 from django.db.models import Q
+from django.db.models import QuerySet
+
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 
 from .forms import RoomForm
 from .models import Room, Topic
-
-
-# Create your views here.
-# rooms = [
-#     {'id': 1, "name": "Let's learn Python together!"},
-#     {'id': 2, "name": "Let's learn JavaScript together!"},
-#     {'id': 3, "name": "Let's learn C# together!"},
-# ]
 
 
 def loginPage(request):
