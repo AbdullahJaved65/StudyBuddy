@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
 from .forms import RoomForm
-from .models import Room, Topic
+from .models import Room, Topic, Message
 
 
 def loginPage(request):
@@ -25,7 +25,7 @@ def loginPage(request):
         password = request.POST.get('password')
 
         try:
-            user = User.objects.get(username=username)
+                user = User.objects.get(username=username)
         except:
             messages.error(request, 'User Does not Exist')
 
@@ -84,7 +84,16 @@ def home(request):
 
 def room(request, pk):
     room_table: QuerySet[Room] = Room.objects.get(id=pk)
-    context = {'room': room_table}
+    room_messages = room_table.message_set.all().order_by("-created")
+
+    if request.method == "POST":
+        message = Message.objects.create(
+            user=request.user,
+            room=room_table,
+            body=request.POST.get('body')
+        )
+        return redirect('room', pk=room_table.id)
+    context = {'room': room_table, 'room_messages': room_messages}
     return render(request, 'base/room.html', context)
 
 
