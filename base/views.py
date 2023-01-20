@@ -1,5 +1,6 @@
 from typing import Any
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 
 from django.db.models import Q
 from django.db.models import QuerySet
@@ -7,12 +8,17 @@ from django.db.models import QuerySet
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 from .forms import RoomForm
 from .models import Room, Topic
 
 
 def loginPage(request):
+    page = 'login'
+    if request.user.is_authenticated:
+        return redirect('home')
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -32,8 +38,18 @@ def loginPage(request):
         else:
             messages.error(request, 'Username OR Password not found')
 
-    context = {}
+    context = {'page': page}
     return render(request, 'base/login_register.html', context)
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect('home')
+
+
+def registerPage(request):
+    page = 'register'
+    return render(request, 'base/login_register.html')
 
 
 def home(request):
@@ -58,6 +74,7 @@ def room(request, pk):
     return render(request, 'base/room.html', context)
 
 
+@login_required(login_url='login')
 def createRoom(request):
     form = RoomForm()
 
@@ -70,9 +87,14 @@ def createRoom(request):
     return render(request, 'base/room_form.html', context)
 
 
+@login_required(login_url='login')
 def updateRoom(request, pk):
     update_room = Room.objects.get(id=pk)
     form = RoomForm(instance=update_room)
+
+    if request.user != update_room.host:
+        return HttpResponse("You are not allowed here! "
+                            "Please Return Back")
 
     if request.method == 'POST':
         form = RoomForm(request.POST, instance=update_room)
@@ -83,8 +105,14 @@ def updateRoom(request, pk):
     return render(request, 'base/room_form.html', context)
 
 
+@login_required(login_url='login')
 def deleteRoom(request, pk):
     delete_room = Room.objects.get(id=pk)
+
+    if request.user != delete_room.host:
+        return HttpResponse("You are not allowed here! "
+                            "Please Return Back")
+
     if request.method == "POST":
         delete_room.delete()
         return redirect('home')
