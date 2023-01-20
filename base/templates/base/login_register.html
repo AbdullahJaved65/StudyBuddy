@@ -35,7 +35,9 @@
         <div>
             <form action="" method="post">
                 {% csrf_token %}
-
+                {{ form.as_p }}
+                <input type="submit"
+                       value="Register">
             </form>
             <p>Already Signed Up?</p>
             <a href="{% url 'login' %}">Login In!</a>

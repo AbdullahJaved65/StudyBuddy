@@ -8,11 +8,12 @@
 </head>
 {% block content %}
     <body>
-    <h1>Hello, World!</h1>
-    <h1>I'm learning Django!</h1>
-    <h1>Wish me Luck!</h1>
     <h1>{{ room.name }}</h1>
-    <h1>{{ room.description }}</h1>
+    <p>{{ room.description }}</p>
+    <div>
+        <h3>Conversations</h3>
+        <hr>
+    </div>
     </body>
 {% endblock content %}
 
