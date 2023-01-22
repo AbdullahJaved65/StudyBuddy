@@ -6,37 +6,54 @@
     <meta charset="UTF-8">
     <title>Rooms</title>
 </head>
-{% block content %}
-    <body>
-    <h1>{{ room.name }}</h1>
-    <p>{{ room.description }}</p>
-    <div class="comment-wrapper">
-        <h3>Conversations</h3>
-        <hr>
-        {% for message in room_messages %}
-            <div>
-                <small>
-                    @{{ message.user }}
-                    {{ message.created|timesince }} ago
-                </small>
-                <p>{{ message.body }}</p>
-                <hr>
-            </div>
-        {% endfor %}
-        {% if request.user.is_authenticated %}
-            <div class="comment-form">
 
-                <form method="post" action="">
-                    {% csrf_token %}
-                    <label>
-                        <input type="text"
-                               name="body"
-                               placeholder="Write Your Message Here...">
-                    </label>
-                </form>
+{% block content %}
+    <style>
+    .room-container {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+    }
+</style>
+    <body>
+    <div class="room-container">
+        <div>
+            <h1>{{ room.name }}</h1>
+            <p>{{ room.description }}</p>
+            <div class="comment-wrapper">
+                <h3>Conversations</h3>
+                <hr>
+                {% for message in room_messages %}
+                    <div>
+                        <small>
+                            @{{ message.user }}
+                            {{ message.created|timesince }} ago
+                        </small>
+                        <p>{{ message.body }}</p>
+                        <hr>
+                    </div>
+                {% endfor %}
+                {% if request.user.is_authenticated %}
+                    <div class="comment-form">
+
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <label>
+                                <input type="text"
+                                       name="body"
+                                       placeholder="Write Your Message Here...">
+                            </label>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
+        <div>
+            <h3>Participants</h3>
+            <hr>
+        </div>
+
     </div>
+
     </body>
 {% endblock content %}
 
