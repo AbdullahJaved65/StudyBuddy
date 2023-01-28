@@ -25,7 +25,7 @@ def loginPage(request):
         password = request.POST.get('password')
 
         try:
-                user = User.objects.get(username=username)
+            user = User.objects.get(username=username)
         except:
             messages.error(request, 'User Does not Exist')
 
@@ -74,17 +74,22 @@ def home(request):
         Q(name__icontains=q) |
         Q(description__icontains=q)
     )
+    room_messages = Message.objects.filter(
+        Q(room__topic__name__icontains=q)
+    )
     room_count = rooms.count()
     topics = Topic.objects.all()
     context = {'rooms': rooms,
                'topics': topics,
-               'room_count': room_count}
+               'room_count': room_count,
+               'room_message': room_messages}
     return render(request, 'base/home.html', context)
 
 
 def room(request, pk):
     room_table: QuerySet[Room] = Room.objects.get(id=pk)
     room_messages = room_table.message_set.all().order_by("-created")
+    participants = room_table.participant.all()
 
     if request.method == "POST":
         message = Message.objects.create(
@@ -92,9 +97,24 @@ def room(request, pk):
             room=room_table,
             body=request.POST.get('body')
         )
+        room_table.participant.add(request.user)
         return redirect('room', pk=room_table.id)
-    context = {'room': room_table, 'room_messages': room_messages}
+    context = {'room': room_table,
+               'room_messages': room_messages,
+               'participants': participants}
     return render(request, 'base/room.html', context)
+
+
+def userProfile(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    room_message = user.message_set.all()
+    topics = Topic.objects.all()
+    context = {'user': user,
+               'rooms': rooms,
+               'room_message': room_message,
+               'topics': topics}
+    return render(request, 'base/profile.html', context)
 
 
 @login_required(login_url='login')
@@ -104,7 +124,9 @@ def createRoom(request):
     if request.method == 'POST':
         form = RoomForm(request.POST)
         if form.is_valid():
-            form.save()
+            room = form.save(commit=False)
+            room.host = request.user
+            room.save()
             return redirect('home')
     context: dict[Any, Any] = {'form': form}
     return render(request, 'base/room_form.html', context)
@@ -140,3 +162,17 @@ def deleteRoom(request, pk):
         delete_room.delete()
         return redirect('home')
     return render(request, 'base/delete.html', dict(obj=delete_room))
+
+
+@login_required(login_url='login')
+def deleteMessage(request, pk):
+    delete_message: Message = Message.objects.get(id=pk)
+
+    if request.user != delete_message.user:
+        return HttpResponse("You are not allowed here! "
+                            "Please Return Back")
+
+    if request.method == "POST":
+        delete_message.delete()
+        return redirect('home')
+    return render(request, 'base/delete.html', dict(obj=delete_message))
