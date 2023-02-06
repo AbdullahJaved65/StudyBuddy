@@ -1,31 +1,47 @@
 {% extends 'main.html' %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Profile</title>
-</head>
-<body>
 {% block content %}
-    <style>
-        .profile-container {
-            display: grid;
-            grid-template-columns: 1fr 3fr 1fr;
-        }
-    </style>
-    {{ user.username }}
-    <div class="profile-container">
-        <div>
+    <main class="profile-page layout layout--3">
+        <div class="container">
+            <!-- Topics Start -->
             {% include 'base/topics_components.html' %}
-        </div>
-        <div>
-            {% include 'base/feed_component.html' %}
-        </div>
-        <div>
-            {% include 'base/activity_component.html' %}
-        </div>
-    </div>
-{% endblock %}
+            <!-- Topics End -->
 
-</body>
-</html>
+            <!-- Room List Start -->
+            <div class="roomList">
+                <div class="profile">
+                    <div class="profile__avatar">
+                        <div class="avatar avatar--large active">
+                            <img src="https://randomuser.me/api/portraits/men/11.jpg"/>
+                        </div>
+                    </div>
+                    <div class="profile__info">
+                        <h3>{{ user.username }}</h3>
+                        <p>@{{ user.username }}</p>
+                        <a href="edit-user.html" class="btn btn--main btn--pill">Edit Profile</a>
+                    </div>
+                    <div class="profile__about">
+                        <h3>About</h3>
+                        <p>
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur illo tenetur
+                            facilis sunt nemo debitis quisquam hic atque aut? Ducimus alias placeat optio
+                            accusamus repudiandae quis ab ex exercitationem rem?
+                        </p>
+                    </div>
+                </div>
+
+                <div class="roomList__header">
+                    <div>
+                        <h2>Study Rooms Hosted by <a>dennis_ivy</a>
+                        </h2>
+                    </div>
+                </div>
+                {% include 'base/feed_component.html' %}
+            </div>
+            <!-- Room List End -->
+
+            <!-- Activities Start -->
+            {% include 'base/activity_component.html' %}
+            <!-- Activities End -->
+        </div>
+    </main>
+{% endblock content %}
